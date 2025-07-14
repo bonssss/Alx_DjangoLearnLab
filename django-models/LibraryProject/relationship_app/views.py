@@ -8,7 +8,7 @@ from .models import Library
 # Create your views here.
 
 def list_books(request):
-    books = Book.objects.select_related('author').all()
+    books = Book.objects.all()
     return render(request, 'relationship_app/book_list.html', {'books': books})
 
 
