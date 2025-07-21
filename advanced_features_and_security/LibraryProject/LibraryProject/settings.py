@@ -139,3 +139,26 @@ CSP_STYLE_SRC = ("'self'", "fonts.googleapis.com")  # Example external style sou
 CSP_IMG_SRC = ("'self'", "data:", "images.example.com")
 CSP_FONT_SRC = ("'self'", "fonts.gstatic.com")
 CSP_CONNECT_SRC = ("'self'",)
+# SECURITY SETTINGS FOR HTTPS AND SECURE HEADERS
+
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True
+# Explanation: Ensures any HTTP request is redirected to HTTPS, protecting data in transit.
+
+# HTTP Strict Transport Security (HSTS)
+SECURE_HSTS_SECONDS = 31536000  # 1 year (in seconds)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  # Applies HSTS to all subdomains
+SECURE_HSTS_PRELOAD = True  # Allows preloading HSTS in browsers
+
+# Secure cookies — only sent over HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Prevent clickjacking attacks
+X_FRAME_OPTIONS = 'DENY'
+
+# Prevent MIME type sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Enable browser's XSS filter
+SECURE_BROWSER_XSS_FILTER = True
