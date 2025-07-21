@@ -29,3 +29,20 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+# Your existing imports and CustomUser model stay unchanged
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.CharField(max_length=100)
+    published_date = models.DateField()
+
+    class Meta:
+        permissions = [
+            ("can_create", "Can create book"),
+            ("can_edit", "Can edit book"),
+            ("can_view", "Can view book"),
+            ("can_delete", "Can delete book"),
+        ]
+
+    def __str__(self):
+        return self.title
