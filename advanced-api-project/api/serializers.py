@@ -3,9 +3,12 @@ from datetime import datetime
 from .models import Author, Book
                           
 class BookSerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source='author.name', read_only=True)
+
     class Meta:
         model= Book
-        fields= '__all__'
+        # fields= '__all__'
+        fields = ['id', 'title', 'publication_year', 'author', 'author_name']
     def validate_publication_year(self, value):
         current_year = datetime.now().year
         if value > current_year:
