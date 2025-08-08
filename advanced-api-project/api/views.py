@@ -1,8 +1,7 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from rest_framework import generics,permissions
-from .models import Author, Book
-from .serializers import AuthorSerializer, BookSerializer
+
+from rest_framework import generics
+from .models import  Book
+from .serializers import  BookSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
@@ -19,12 +18,12 @@ class BookListView(generics.ListAPIView):
     
     #enable filtering, searching, and ordering
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['author']
+    filterset_fields = ['author', 'publication_year','title']  # Assuming 'author' is a ForeignKey in Book model,
     
         
     search_fields = ['title']  # Assuming 'author' is a ForeignKey in Book model
     ordering_fields = ['title', 'publication_year']  # Assuming these fields exist in the
-    ordering = ['title']  # Default ordering
+    ordering = ['title','publication_year']  # Default ordering
     
     
 class BookDetailView(generics.RetrieveAPIView):
