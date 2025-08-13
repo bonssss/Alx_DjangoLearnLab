@@ -10,6 +10,7 @@ from .models import Post, Profile, Comment
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from taggit.models import Tag
 from django.db.models import Q
+from .forms import PostForm
 
 
 def home(request):
@@ -53,7 +54,8 @@ class PostDetailView(DetailView):
 class PostCreateView(CreateView):
     model = Post
     template_name = 'blog/post_form.html'
-    fields = ['title', 'content','tags']
+    form_class = PostForm
+    # fields = ['title', 'content','tags']
     def get_success_url(self):
         return reverse_lazy('post-list') 
     def form_valid(self, form):
@@ -64,7 +66,8 @@ class PostCreateView(CreateView):
 class PostUpdateView(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
     model = Post
     template_name = 'blog/post_form.html'
-    fields = ['title', 'content','tags' ]
+    form_class = PostForm
+    # fields = ['title', 'content','tags' ]
     def get_success_url(self):
         return reverse_lazy('post-list') 
 
