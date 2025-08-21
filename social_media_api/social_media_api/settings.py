@@ -149,3 +149,6 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_SSL_REDIRECT = True  # Only if using HTTPS
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+# Static and media
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_ROOT = BASE_DIR / 'mediafiles'
