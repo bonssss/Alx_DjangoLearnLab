@@ -87,7 +87,7 @@ from rest_framework.authtoken.models import Token
 from .serializers import UserRegistrationSerializer, UserLoginSerializer, UserProfileSerializer
 from .serializers import UserProfileSerializer  # For listing users
 
-User = get_user_model()
+CustomUser = get_user_model()
 
 # ✅ Register User
 class RegisterView(generics.CreateAPIView):
@@ -121,7 +121,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
 # ✅ User List View (required by checker)
 class UserListView(generics.GenericAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -137,8 +137,8 @@ class FollowUserView(APIView):
 
     def post(self, request, user_id):
         try:
-            target_user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
+            target_user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
         if request.user == target_user:
@@ -157,8 +157,8 @@ class UnfollowUserView(APIView):
 
     def post(self, request, user_id):
         try:
-            target_user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
+            target_user = CustomUser.objects.get(id=user_id)
+        except CustomUser.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
         if target_user not in request.user.following.all():
