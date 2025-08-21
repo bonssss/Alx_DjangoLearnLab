@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions, filters
 from rest_framework.pagination import PageNumberPagination
 from .models import Post, Comment, Like
@@ -73,40 +74,78 @@ class FeedView(generics.ListAPIView):
         return Post.objects.filter(author__in=following_users).order_by('-created_at')
 
 
-from notifications.utils import create_notification
+# from notifications.utils import create_notification
 
+# class LikePostView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request, pk):
+#         try:
+#             post = Post.objects.get(pk=pk)
+#         except Post.DoesNotExist:
+#             return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+
+#         # Check if user already liked the post
+#         like, created = Like.objects.get_or_create(post=post, user=request.user)
+#         if not created:
+#             return Response({'message': 'You already liked this post'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         # Create notification for post author
+#         if post.author != request.user:
+#             create_notification(actor=request.user, recipient=post.author, verb="liked your post", target=post)
+
+#         return Response({'message': 'Post liked successfully'}, status=status.HTTP_200_OK)
+
+
+# class UnlikePostView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request, pk):
+#         try:
+#             post = Post.objects.get(pk=pk)
+#         except Post.DoesNotExist:
+#             return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+
+#         like = Like.objects.filter(post=post, user=request.user).first()
+#         if like:
+#             like.delete()
+#             return Response({'message': 'Post unliked successfully'}, status=status.HTTP_200_OK)
+#         return Response({'message': 'You have not liked this post'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Like a post
 class LikePostView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        try:
-            post = Post.objects.get(pk=pk)
-        except Post.DoesNotExist:
-            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+        post = get_object_or_404(Post, pk=pk)
 
-        # Check if user already liked the post
-        like, created = Like.objects.get_or_create(post=post, user=request.user)
+        # Prevent duplicate likes
+        like, created = Like.objects.get_or_create(user=request.user, post=post)
         if not created:
-            return Response({'message': 'You already liked this post'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'You have already liked this post'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Create notification for post author
+        # Create notification if liking someone else's post
         if post.author != request.user:
-            create_notification(actor=request.user, recipient=post.author, verb="liked your post", target=post)
+            Notification.objects.create(
+                recipient=post.author,
+                actor=request.user,
+                verb='liked your post',
+                target_post=post
+            )
 
         return Response({'message': 'Post liked successfully'}, status=status.HTTP_200_OK)
 
 
+# Unlike a post
 class UnlikePostView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
         try:
-            post = Post.objects.get(pk=pk)
-        except Post.DoesNotExist:
-            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        like = Like.objects.filter(post=post, user=request.user).first()
-        if like:
+            like = Like.objects.get(user=request.user, post=post)
             like.delete()
             return Response({'message': 'Post unliked successfully'}, status=status.HTTP_200_OK)
-        return Response({'message': 'You have not liked this post'}, status=status.HTTP_400_BAD_REQUEST)
+        except Like.DoesNotExist:
+            return Response({'message': 'You have not liked this post'}, status=status.HTTP_400_BAD_REQUEST)
