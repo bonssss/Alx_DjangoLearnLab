@@ -33,3 +33,38 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+    
+class FollowUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        try:
+            target_user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.user == target_user:
+            return Response({'error': 'You cannot follow yourself'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if target_user in request.user.following.all():
+            return Response({'message': f'You already follow {target_user.username}'}, status=status.HTTP_400_BAD_REQUEST)
+
+        request.user.following.add(target_user)
+        return Response({'message': f'You are now following {target_user.username}'}, status=status.HTTP_200_OK)
+
+
+# ✅ Unfollow User
+class UnfollowUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        try:
+            target_user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if target_user not in request.user.following.all():
+            return Response({'message': f'You are not following {target_user.username}'}, status=status.HTTP_400_BAD_REQUEST)
+
+        request.user.following.remove(target_user)
+        return Response({'message': f'You have unfollowed {target_user.username}'}, status=status.HTTP_200_OK)
